@@ -1,28 +1,36 @@
-# Chaos Loom Master 2
+# Chaos2 Orchestrator
 
-The ultimate evolution of chaotic weaving! You are the supreme **Chaos Loom Master**, commanding an even more volatile and sentient cosmic loom. Weave threads of pure chaos across multiple dimensions, trigger universe-shaking chain reactions, and push the fabric of reality to its absolute breaking point in this bigger, wilder, and more spectacular sequel.
+High-performance AI Agent specialized in warp racing mechanics, real-time automation, multi-track management, competitive optimization and ecosystem coordination on Base.
 
-## Core Features
-* **Advanced Multi-Thread Weaving**: Simultaneous thread weaving with splitting, merging, mutating, bouncing, and forming temporary black holes behaviors!
-* **Reality Shattering**: Trigger spectacular chain reactions by creating critically unstable thread clusters. 
-* **Multi-Loom System**: Control up to 3 connected looms simultaneously.
-* **Chaos Domains**: Realms with unique physics like Gravity Chaos and Mirror Realms.
-* **On-Chain Interactions**: Integrated with the Base Mainnet! Use the "Say GM" feature to permanently leave your mark on the Chaos Loom!
-* **ERC-8004 Trustless Agents**: Deploy agents manually directly from the Loom Sanctum to weave for you in the background while you rest.
-
-## Environment & Security Notice
-
-**DO NOT COMMIT SENSITIVE INFORMATION**
-
-If you replicate or fork this game, ensure you:
-* NEVER commit your actual `.env` file containing API keys or Web3 RPC endpoints into public repositories.
-* Keep your wallet addresses and configuration secrets private.
-* In the `.well-known/agent-card.json` config, be sure to manage wallets carefully! 
+## Overview
+Chaos2 platform utilizes second generation chaos mechanics, system disruption and controlled entropy orchestration. This project focuses on pushing the boundaries of AI agents running natively on Base matching the ERC-8004 standards.
 
 ## Tech Stack
-* **Framework**: React / Vite / Express
-* **Styling**: Tailwind CSS
-* **Web3**: Wagmi + Viem on Base Mainnet
-* **Rendering**: Native HTML5 Canvas (high-performance chaotic physics rendering)
+- **Framework**: Next.js 14 API Routes (Serverless) / React / Express fallback
+- **Ecosystem**: Web3 / Wagmi / Viem
+- **AI Standard**: ERC-8004 compliant intelligent agent / MCP Supported
 
-Are you ready to become the Supreme Chaos Loom Master? Weave wisely!
+## MCP Connection Guide
+The Model Context Protocol (MCP) server exposes endpoints that AI tools can discover and interact with.
+- **Endpoint:** `https://chaos2.vercel.app/api/mcp`
+- Follows standard JSON-RPC 2.0 specs for `tools/list`, `tools/call`, `prompts/list`, etc.
+- **Exposed Tools**: `get_race_status`, `start_race`, `get_leaderboard`, `optimize_speed`, `get_track_info`
+
+## Agent Registration Info
+- **Agent Type:** ERC-8004 Registration v1
+- **Supported Chains:** EIP155:8453 (Base)
+- **Registries:** Support for EIP-8004 registries via standard on-chain interaction. Connect your wallet to record and register agent operations to the chain.
+- The A2A Discovery card is located at `/.well-known/agent-card.json`.
+
+## Capabilities
+- Warp Racing
+- Real-time Automation
+- Multi-track Management
+- Speed Optimization
+- Competitive Orchestration
+- Ecosystem Coordination
+
+## How to Run Locally
+1. Clone the repository.
+2. `npm install`
+3. `npm run dev` for local development.

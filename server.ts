@@ -38,7 +38,52 @@ async function startServer() {
   app.post("/api/mcp", (req, res) => {
     try {
       const body = req.body;
-      const { action, command, params, task } = body;
+      const { jsonrpc, method, params, id, action, command, task } = body;
+
+      if (jsonrpc === "2.0") {
+        switch (method) {
+          case "initialize":
+            return res.json({
+              jsonrpc: "2.0",
+              id,
+              result: {
+                protocolVersion: "2024-11-05",
+                capabilities: { tools: {}, prompts: {}, resources: {} },
+                serverInfo: { name: "Chaos2 Orchestrator", version: "1.0.0" }
+              }
+            });
+          case "tools/list":
+            return res.json({
+              jsonrpc: "2.0",
+              id,
+              result: {
+                tools: [
+                  { name: "get_race_status", description: "Get the current status of the warp race", inputSchema: { type: "object", properties: {} } },
+                  { name: "start_race", description: "Start a new warp race", inputSchema: { type: "object", properties: {} } },
+                  { name: "get_leaderboard", description: "Get the current race leaderboard", inputSchema: { type: "object", properties: {} } },
+                  { name: "optimize_speed", description: "Optimize warp speed parameters", inputSchema: { type: "object", properties: {} } },
+                  { name: "get_track_info", description: "Get information about the current race track", inputSchema: { type: "object", properties: {} } }
+                ]
+              }
+            });
+          case "tools/call":
+            return res.json({
+              jsonrpc: "2.0",
+              id,
+              result: {
+                content: [
+                  { type: "text", text: `Successfully executed tool: ${params?.name}` }
+                ]
+              }
+            });
+          case "prompts/list":
+            return res.json({ jsonrpc: "2.0", id, result: { prompts: [] } });
+          case "resources/list":
+            return res.json({ jsonrpc: "2.0", id, result: { resources: [] } });
+          default:
+            return res.json({ jsonrpc: "2.0", id, error: { code: -32601, message: "Method not found" } });
+        }
+      }
 
       const cmd = (action || command || task || "").toLowerCase();
 
