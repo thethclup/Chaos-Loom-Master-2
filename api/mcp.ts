@@ -1,30 +1,21 @@
-import express from "express";
-import path from "path";
-import { createServer as createViteServer } from "vite";
+export const config = {
+  runtime: 'edge',
+};
 
-async function startServer() {
-  const app = express();
-  const PORT = 3000;
+export default async function handler(req: Request) {
+  // CORS Headers
+  const corsHeaders = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  };
 
-  // Middleware to parse JSON bodies
-  app.use(express.json());
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { status: 204, headers: corsHeaders });
+  }
 
-  // API Routes
-  app.get("/api/agent", (req, res) => {
-    res.json({
-      name: "Chaos2 Orchestrator",
-      description: "Second generation chaos and entropy orchestrator",
-      status: "active",
-      wallet: "0xe157F1F5e12adB38Ba013683E9Ce24efe21e5bA6",
-      platform: "Chaos2",
-      version: "1.0.0",
-      type: "ERC-8004 Agent",
-      lastUpdated: new Date().toISOString()
-    });
-  });
-
-  app.get("/api/mcp", (req, res) => {
-    res.json({
+  if (req.method === 'GET') {
+    return new Response(JSON.stringify({
       protocol: "MCP",
       version: "1.0.0",
       name: "Chaos2 MCP Endpoint",
@@ -32,18 +23,23 @@ async function startServer() {
       description: "Active MCP server for Chaos2 Orchestrator",
       capabilities: ["chaos-engineering", "system-disruption", "controlled-entropy"],
       timestamp: new Date().toISOString()
+    }), {
+      status: 200,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     });
-  });
+  }
 
-  app.post("/api/mcp", (req, res) => {
+  if (req.method === 'POST') {
     try {
-      const body = req.body;
+      const body = await req.json();
       const { jsonrpc, method, params, id, action, command, task } = body;
 
+      // Handle Standard MCP Protocol JSON-RPC
       if (jsonrpc === "2.0") {
+        let resultData: any = {};
         switch (method) {
           case "initialize":
-            return res.json({
+            resultData = {
               jsonrpc: "2.0",
               id,
               result: {
@@ -51,9 +47,10 @@ async function startServer() {
                 capabilities: { tools: { listChanged: true }, prompts: { listChanged: true }, resources: { listChanged: true, subscribe: false } },
                 serverInfo: { name: "Chaos2 Orchestrator", version: "1.0.0" }
               }
-            });
+            };
+            break;
           case "tools/list":
-            return res.json({
+            resultData = {
               jsonrpc: "2.0",
               id,
               result: {
@@ -65,9 +62,10 @@ async function startServer() {
                   { name: "get_track_info", description: "Get information about the current race track", inputSchema: { type: "object", properties: {}, required: [] } }
                 ]
               }
-            });
+            };
+            break;
           case "tools/call":
-            return res.json({
+            resultData = {
               jsonrpc: "2.0",
               id,
               result: {
@@ -75,91 +73,59 @@ async function startServer() {
                   { type: "text", text: `Successfully executed tool: ${params?.name}` }
                 ]
               }
-            });
+            };
+            break;
           case "prompts/list":
-            return res.json({ jsonrpc: "2.0", id, result: { prompts: [] } });
+            resultData = { jsonrpc: "2.0", id, result: { prompts: [] } };
+            break;
           case "resources/list":
-            return res.json({ jsonrpc: "2.0", id, result: { resources: [] } });
+            resultData = { jsonrpc: "2.0", id, result: { resources: [] } };
+            break;
           default:
-            return res.json({ jsonrpc: "2.0", id, error: { code: -32601, message: "Method not found" } });
+            resultData = { jsonrpc: "2.0", id, error: { code: -32601, message: "Method not found" } };
         }
+        return new Response(JSON.stringify(resultData), {
+          status: 200,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
       }
 
+      // Handle Custom System Actions
       const cmd = (action || command || task || "").toLowerCase();
-
       let result: any = {};
 
       switch (cmd) {
         case "status":
         case "ping":
-          result = { 
-            status: "online", 
-            agent: "Chaos2 Orchestrator",
-            message: "Chaos level 2 engaged - System unstable and ready" 
-          };
+          result = { status: "online", agent: "Chaos2 Orchestrator", message: "Chaos level 2 engaged - System unstable and ready" };
           break;
-
         case "execute":
-          result = {
-            success: true,
-            executed: params || command,
-            executedAt: new Date().toISOString(),
-            message: "Chaos successfully injected into the system"
-          };
+          result = { success: true, executed: params || command, executedAt: new Date().toISOString(), message: "Chaos successfully injected into the system" };
           break;
-
         case "get_info":
-          result = {
-            name: "Chaos2 Orchestrator",
-            wallet: "0xe157F1F5e12adB38Ba013683E9Ce24efe21e5bA6",
-            platform: "Base",
-            version: "1.0.0"
-          };
+          result = { name: "Chaos2 Orchestrator", wallet: "0xe157F1F5e12adB38Ba013683E9Ce24efe21e5bA6", platform: "Base", version: "1.0.0" };
           break;
-
         default:
-          result = {
-            success: true,
-            message: "Chaos command received",
-            data: body
-          };
+          result = { success: true, message: "Chaos command received", data: body };
       }
 
-      res.json({
+      return new Response(JSON.stringify({
         status: "success",
         agent: "Chaos2 Orchestrator",
         response: result,
         receivedAt: new Date().toISOString()
+      }), {
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
 
     } catch (error) {
-      res.status(400).json({
+      return new Response(JSON.stringify({
         status: "error",
         message: "Failed to process chaos command"
-      });
+      }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
-  });
-
-  // Vite middleware for development
-  if (process.env.NODE_ENV !== "production") {
-    const vite = await createViteServer({
-      server: { middlewareMode: true },
-      appType: "spa",
-    });
-    app.use(vite.middlewares);
-  } else {
-    // Note: ensure we import path and resolve correctly in ES module
-    const distPath = path.resolve(process.cwd(), 'dist');
-    app.use(express.static(distPath));
-    // Provide a SPA fallback
-    app.get('*', (req, res) => {
-      res.sendFile(path.join(distPath, 'index.html'));
-    });
   }
 
-  app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-  });
+  return new Response("Not Found", { status: 404 });
 }
-
-startServer();

@@ -42,10 +42,10 @@ export async function POST(req: Request) {
             id,
             result: {
               protocolVersion: "2024-11-05",
-              capabilities: { tools: {}, prompts: {}, resources: {} },
+              capabilities: { tools: { listChanged: true }, prompts: { listChanged: true }, resources: { listChanged: true, subscribe: false } },
               serverInfo: { name: "Chaos2 Orchestrator", version: "1.0.0" }
             }
-          });
+          }, { headers: { 'Access-Control-Allow-Origin': '*' } });
         case "tools/list":
           return NextResponse.json({
             jsonrpc: "2.0",
@@ -55,31 +55,31 @@ export async function POST(req: Request) {
                 {
                   name: "get_race_status",
                   description: "Get the current status of the warp race",
-                  inputSchema: { type: "object", properties: {} }
+                  inputSchema: { type: "object", properties: {}, required: [] }
                 },
                 {
                   name: "start_race",
                   description: "Start a new warp race",
-                  inputSchema: { type: "object", properties: {} }
+                  inputSchema: { type: "object", properties: {}, required: [] }
                 },
                 {
                   name: "get_leaderboard",
                   description: "Get the current race leaderboard",
-                  inputSchema: { type: "object", properties: {} }
+                  inputSchema: { type: "object", properties: {}, required: [] }
                 },
                 {
                   name: "optimize_speed",
                   description: "Optimize warp speed parameters",
-                  inputSchema: { type: "object", properties: {} }
+                  inputSchema: { type: "object", properties: {}, required: [] }
                 },
                 {
                   name: "get_track_info",
                   description: "Get information about the current race track",
-                  inputSchema: { type: "object", properties: {} }
+                  inputSchema: { type: "object", properties: {}, required: [] }
                 }
               ]
             }
-          });
+          }, { headers: { 'Access-Control-Allow-Origin': '*' } });
         case "tools/call":
           return NextResponse.json({
             jsonrpc: "2.0",
@@ -89,13 +89,13 @@ export async function POST(req: Request) {
                 { type: "text", text: `Successfully executed tool: ${params?.name}` }
               ]
             }
-          });
+          }, { headers: { 'Access-Control-Allow-Origin': '*' } });
         case "prompts/list":
-          return NextResponse.json({ jsonrpc: "2.0", id, result: { prompts: [] } });
+          return NextResponse.json({ jsonrpc: "2.0", id, result: { prompts: [] } }, { headers: { 'Access-Control-Allow-Origin': '*' } });
         case "resources/list":
-          return NextResponse.json({ jsonrpc: "2.0", id, result: { resources: [] } });
+          return NextResponse.json({ jsonrpc: "2.0", id, result: { resources: [] } }, { headers: { 'Access-Control-Allow-Origin': '*' } });
         default:
-          return NextResponse.json({ jsonrpc: "2.0", id, error: { code: -32601, message: "Method not found" } });
+          return NextResponse.json({ jsonrpc: "2.0", id, error: { code: -32601, message: "Method not found" } }, { headers: { 'Access-Control-Allow-Origin': '*' } });
       }
     }
 
