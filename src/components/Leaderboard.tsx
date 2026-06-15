@@ -1,5 +1,6 @@
 import { GameState } from '../App';
-import { useAccount, useSendTransaction, useWriteContract } from 'wagmi';
+import { useAccount } from 'wagmi';
+import { useSayGM } from '../hooks/useSayGM';
 
 interface Props {
   setGameState: (state: GameState) => void;
@@ -7,18 +8,7 @@ interface Props {
 
 export default function Leaderboard({ setGameState }: Props) {
   const { isConnected } = useAccount();
-  const { sendTransaction } = useSendTransaction();
-
-  const handleSayGm = () => {
-    // Basic "Say GM" transaction (Mocked or simple transfer to oneself with data if we had an ABI, 
-    // here we just use sendTransaction to self for demonstration of on-chain tx).
-    // In a real app we'd call a contract method.
-    sendTransaction({
-      to: '0x0000000000000000000000000000000000000000',
-      value: BigInt(0),
-      data: '0x474d', // 'GM' in hex
-    });
-  };
+  const { sayGM, isPending } = useSayGM();
 
   return (
     <div className="absolute inset-0 z-50 flex flex-col bg-black bg-opacity-90 backdrop-blur-xl p-8 overflow-y-auto">
@@ -61,11 +51,11 @@ export default function Leaderboard({ setGameState }: Props) {
             <p className="text-xs text-gray-400 mb-6 max-w-sm mx-auto">Submit a transaction to the Base network to leave your mark permanently in the Chaos Loom.</p>
             
             <button 
-              onClick={handleSayGm}
-              disabled={!isConnected}
-              className={`w-full py-3 font-mono text-sm tracking-widest uppercase transition-colors ${isConnected ? 'bg-blue-600 text-white hover:bg-blue-500' : 'bg-gray-800 text-gray-500 cursor-not-allowed'}`}
+              onClick={sayGM}
+              disabled={!isConnected || isPending}
+              className={`w-full py-3 font-mono text-sm tracking-widest uppercase transition-colors ${!isConnected || isPending ? 'bg-gray-800 text-gray-500 cursor-not-allowed' : 'bg-blue-600 text-white hover:bg-blue-500'}`}
             >
-              {isConnected ? 'SAY GM ON Base' : 'CONNECT WALLET FIRST'}
+              {!isConnected ? 'CONNECT WALLET FIRST' : isPending ? 'RECORDING GM ON BASE...' : 'SAY GM ON Base'}
             </button>
         </div>
 

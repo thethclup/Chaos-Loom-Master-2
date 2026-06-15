@@ -22,6 +22,21 @@
       "id": "performance-optimization",
       "name": "Performance Optimization",
       "description": "Analyze and optimize racing performance, timing and strategy in real-time."
+    },
+    {
+      "id": "chaos-engineering",
+      "name": "Chaos Engineering",
+      "description": "Advanced system disruption and resilience testing."
+    },
+    {
+      "id": "system-disruption",
+      "name": "System Disruption",
+      "description": "Trigger universe-shaking chain reactions safely and competitively."
+    },
+    {
+      "id": "controlled-entropy",
+      "name": "Controlled Entropy",
+      "description": "Orchestrate chaos and anomaly patterns in closed loops."
     }
   ],
   "services": [

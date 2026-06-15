@@ -55,11 +55,11 @@ export default async function handler(req: Request) {
               id,
               result: {
                 tools: [
-                  { name: "get_race_status", description: "Get the current status of the warp race", inputSchema: { type: "object", properties: {}, required: [] } },
-                  { name: "start_race", description: "Start a new warp race", inputSchema: { type: "object", properties: {}, required: [] } },
-                  { name: "get_leaderboard", description: "Get the current race leaderboard", inputSchema: { type: "object", properties: {}, required: [] } },
-                  { name: "optimize_speed", description: "Optimize warp speed parameters", inputSchema: { type: "object", properties: {}, required: [] } },
-                  { name: "get_track_info", description: "Get information about the current race track", inputSchema: { type: "object", properties: {}, required: [] } }
+                  { name: "get_race_status", description: "Get the current status of the warp race", inputSchema: { type: "object", properties: {} } },
+                  { name: "start_race", description: "Start a new warp race", inputSchema: { type: "object", properties: {} } },
+                  { name: "get_leaderboard", description: "Get the current race leaderboard", inputSchema: { type: "object", properties: {} } },
+                  { name: "optimize_speed", description: "Optimize warp speed parameters", inputSchema: { type: "object", properties: {} } },
+                  { name: "get_track_info", description: "Get information about the current race track", inputSchema: { type: "object", properties: {} } }
                 ]
               }
             };

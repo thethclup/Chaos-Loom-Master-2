@@ -6,9 +6,9 @@ import RealityShattered from './components/RealityShattered';
 import ChaosCodex from './components/ChaosCodex';
 import Leaderboard from './components/Leaderboard';
 import LoomSanctum from './components/LoomSanctum';
-import { useAccount, useSendTransaction } from 'wagmi';
+import { useAccount } from 'wagmi';
 import { Sun } from 'lucide-react';
-import { parseEther } from 'viem';
+import { useSayGM } from './hooks/useSayGM';
 
 export type GameState = 'TITLE' | 'PLAYING' | 'SHATTERED' | 'CODEX' | 'LEADERBOARD' | 'SANCTUM';
 
@@ -16,26 +16,23 @@ export default function App() {
   const [gameState, setGameState] = useState<GameState>('TITLE');
   const [score, setScore] = useState(0);
   const { isConnected } = useAccount();
-  const { sendTransaction } = useSendTransaction();
-
-  const sendGMTransaction = () => {
-    sendTransaction({
-      to: '0xc35B9997B63B1CE14f8F513f7eddD9a7ABbB33d7',
-      value: parseEther('0'),
-      data: '0x474d', // "GM" in hex
-    });
-  };
+  const { sayGM, isPending } = useSayGM();
 
   return (
     <div className="w-full h-screen bg-black overflow-hidden font-sans text-white select-none relative">
       {isConnected && (
         <div className="absolute top-4 right-4 z-50">
           <button
-            onClick={sendGMTransaction}
-            className="px-3 py-2 rounded-lg bg-[#E8A020]/20 hover:bg-[#E8A020]/30 border border-[#E8A020]/40 text-[#E8A020] transition-colors flex items-center gap-2 font-['Cinzel'] text-xs font-bold"
+            onClick={sayGM}
+            disabled={isPending}
+            className={`px-3 py-2 rounded-lg border transition-colors flex items-center gap-2 font-['Cinzel'] text-xs font-bold ${
+              isPending 
+                ? 'bg-gray-800 text-gray-500 border-gray-700 cursor-not-allowed' 
+                : 'bg-[#E8A020]/20 hover:bg-[#E8A020]/30 border-[#E8A020]/40 text-[#E8A020]'
+            }`}
           >
             <Sun size={16} />
-            Say GM
+            {isPending ? 'Sending...' : 'Say GM'}
           </button>
         </div>
       )}

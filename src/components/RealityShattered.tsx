@@ -1,9 +1,8 @@
 import { GameState } from '../App';
 import { motion } from 'motion/react';
 import { CODE, getAttributionCode, logTransactionAttribution } from '../lib/erc8021/attribution';
-import { useSendTransaction } from 'wagmi';
-import { parseEther } from 'viem';
 import { Sun } from 'lucide-react';
+import { useSayGM } from '../hooks/useSayGM';
 
 interface Props {
   setGameState: (state: GameState) => void;
@@ -11,7 +10,7 @@ interface Props {
 }
 
 export default function RealityShattered({ setGameState, score }: Props) {
-  const { sendTransaction } = useSendTransaction();
+  const { sayGM, isPending } = useSayGM();
   
   const handleRecordOnChain = () => {
     // Mock Web3 SIWE & Tx Recording
@@ -19,14 +18,6 @@ export default function RealityShattered({ setGameState, score }: Props) {
     console.log(`Recording score ${score} on Base Mainnet...`);
     logTransactionAttribution("0x" + Math.random().toString(16).slice(2, 66));
     alert(`Tx Sent! Builder Code: ${CODE}. Score recorded with SIWE.`);
-  };
-
-  const handleSayGM = () => {
-    sendTransaction({
-      to: '0xc35B9997B63B1CE14f8F513f7eddD9a7ABbB33d7',
-      value: parseEther('0'),
-      data: '0x474d', // "GM" in hex
-    });
   };
 
   return (
@@ -65,11 +56,16 @@ export default function RealityShattered({ setGameState, score }: Props) {
           </button>
           
           <button 
-            onClick={handleSayGM}
-            className="w-full bg-[#E8A020]/20 border border-[#E8A020]/50 text-[#E8A020] py-4 font-black uppercase text-sm tracking-widest hover:bg-[#E8A020]/30 transition-colors shadow-[0_0_20px_rgba(232,160,32,0.2)] flex justify-center items-center gap-2"
+            onClick={sayGM}
+            disabled={isPending}
+            className={`w-full py-4 font-black uppercase text-sm tracking-widest transition-colors shadow-[0_0_20px_rgba(232,160,32,0.2)] flex justify-center items-center gap-2 ${
+              isPending 
+                ? 'bg-gray-800 text-gray-500 border border-gray-700 cursor-not-allowed'
+                : 'bg-[#E8A020]/20 border border-[#E8A020]/50 text-[#E8A020] hover:bg-[#E8A020]/30'
+            }`}
           >
             <Sun size={18} />
-            Say GM
+            {isPending ? 'Sending...' : 'Say GM'}
           </button>
           
           <button 
