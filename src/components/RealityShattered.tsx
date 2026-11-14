@@ -1,8 +1,10 @@
+import { useState } from 'react';
 import { GameState } from '../App';
 import { motion } from 'motion/react';
-import { CODE, getAttributionCode, logTransactionAttribution } from '../lib/erc8021/attribution';
+import { CODE, logTransactionAttribution } from '../lib/erc8021/attribution';
 import { Sun } from 'lucide-react';
 import { useSayGM } from '../hooks/useSayGM';
+import { BASE_EXPLORER_URL } from '../lib/wagmi';
 
 interface Props {
   setGameState: (state: GameState) => void;
@@ -10,14 +12,15 @@ interface Props {
 }
 
 export default function RealityShattered({ setGameState, score }: Props) {
-  const { sayGM, isPending } = useSayGM();
+  const { sayGM, isPending, isConfirming, isConfirmed, txHash, error } = useSayGM();
+  const [recordedMessage, setRecordedMessage] = useState<string | null>(null);
+  const isBusy = isPending || isConfirming;
   
-  const handleRecordOnChain = () => {
-    // Mock Web3 SIWE & Tx Recording
-    const attrCode = getAttributionCode();
-    console.log(`Recording score ${score} on Base Mainnet...`);
-    logTransactionAttribution("0x" + Math.random().toString(16).slice(2, 66));
-    alert(`Tx Sent! Builder Code: ${CODE}. Score recorded with SIWE.`);
+  const handleRecordOnChain = async () => {
+    setRecordedMessage(null);
+    await sayGM();
+    logTransactionAttribution(`score:${Math.floor(score)}`);
+    setRecordedMessage(`Builder Code ${CODE} attached on Base Mainnet.`);
   };
 
   return (
@@ -50,23 +53,41 @@ export default function RealityShattered({ setGameState, score }: Props) {
         <div className="flex flex-col gap-4">
           <button 
             onClick={handleRecordOnChain}
-            className="w-full bg-[#0052FF] text-white py-4 font-black uppercase text-sm tracking-widest hover:bg-blue-600 transition-colors shadow-[0_0_20px_rgba(0,82,255,0.4)]"
+            disabled={isBusy}
+            className="w-full bg-[#0052FF] text-white py-4 font-black uppercase text-sm tracking-widest hover:bg-blue-600 transition-colors shadow-[0_0_20px_rgba(0,82,255,0.4)] disabled:bg-gray-800 disabled:text-gray-500 disabled:cursor-not-allowed"
           >
-            Record Legendary Chaos On-Chain
+            {isBusy ? 'Recording on Base Mainnet...' : 'Record Legendary Chaos On-Chain'}
           </button>
           
           <button 
             onClick={sayGM}
-            disabled={isPending}
+            disabled={isBusy}
             className={`w-full py-4 font-black uppercase text-sm tracking-widest transition-colors shadow-[0_0_20px_rgba(232,160,32,0.2)] flex justify-center items-center gap-2 ${
-              isPending 
+              isBusy 
                 ? 'bg-gray-800 text-gray-500 border border-gray-700 cursor-not-allowed'
                 : 'bg-[#E8A020]/20 border border-[#E8A020]/50 text-[#E8A020] hover:bg-[#E8A020]/30'
             }`}
           >
             <Sun size={18} />
-            {isPending ? 'Sending...' : 'Say GM'}
+            {isPending ? 'Sending...' : isConfirming ? 'Confirming...' : 'Say GM'}
           </button>
+
+          {isConfirmed && txHash && (
+            <a
+              href={`${BASE_EXPLORER_URL}/tx/${txHash}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs font-mono text-emerald-400 hover:underline"
+            >
+              Confirmed on Base Mainnet ({txHash.slice(0, 8)}...{txHash.slice(-6)})
+            </a>
+          )}
+          {recordedMessage && !error && (
+            <p className="text-xs font-mono text-blue-300">{recordedMessage}</p>
+          )}
+          {error && (
+            <p className="text-xs font-mono text-red-400">{error}</p>
+          )}
           
           <button 
             onClick={() => setGameState('TITLE')}

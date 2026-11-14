@@ -1,6 +1,7 @@
 import { GameState } from '../App';
 import { useAccount } from 'wagmi';
 import { useSayGM } from '../hooks/useSayGM';
+import { BASE_EXPLORER_URL } from '../lib/wagmi';
 
 interface Props {
   setGameState: (state: GameState) => void;
@@ -8,7 +9,8 @@ interface Props {
 
 export default function Leaderboard({ setGameState }: Props) {
   const { isConnected } = useAccount();
-  const { sayGM, isPending } = useSayGM();
+  const { sayGM, isPending, isConfirming, isConfirmed, txHash, error } = useSayGM();
+  const isBusy = isPending || isConfirming;
 
   return (
     <div className="absolute inset-0 z-50 flex flex-col bg-black bg-opacity-90 backdrop-blur-xl p-8 overflow-y-auto">
@@ -48,15 +50,35 @@ export default function Leaderboard({ setGameState }: Props) {
 
         <div className="bg-gray-900/50 p-6 border border-gray-800 text-center">
             <h3 className="text-sm font-bold uppercase tracking-widest text-white mb-4">On-Chain Interaction</h3>
-            <p className="text-xs text-gray-400 mb-6 max-w-sm mx-auto">Submit a transaction to the Base network to leave your mark permanently in the Chaos Loom.</p>
+            <p className="text-xs text-gray-400 mb-6 max-w-sm mx-auto">Submit a transaction to Base Mainnet (200ms canonical blocks) to leave your mark permanently in the Chaos Loom.</p>
             
             <button 
               onClick={sayGM}
-              disabled={!isConnected || isPending}
-              className={`w-full py-3 font-mono text-sm tracking-widest uppercase transition-colors ${!isConnected || isPending ? 'bg-gray-800 text-gray-500 cursor-not-allowed' : 'bg-blue-600 text-white hover:bg-blue-500'}`}
+              disabled={!isConnected || isBusy}
+              className={`w-full py-3 font-mono text-sm tracking-widest uppercase transition-colors ${!isConnected || isBusy ? 'bg-gray-800 text-gray-500 cursor-not-allowed' : 'bg-blue-600 text-white hover:bg-blue-500'}`}
             >
-              {!isConnected ? 'CONNECT WALLET FIRST' : isPending ? 'RECORDING GM ON BASE...' : 'SAY GM ON Base'}
+              {!isConnected
+                ? 'CONNECT WALLET FIRST'
+                : isPending
+                  ? 'SUBMITTING TO BASE...'
+                  : isConfirming
+                    ? 'CONFIRMING ON BASE...'
+                    : 'SAY GM ON Base'}
             </button>
+
+            {isConfirmed && txHash && (
+              <a
+                href={`${BASE_EXPLORER_URL}/tx/${txHash}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-3 inline-block text-xs font-mono text-emerald-400 hover:underline"
+              >
+                Confirmed on Base Mainnet ({txHash.slice(0, 8)}...{txHash.slice(-6)})
+              </a>
+            )}
+            {error && (
+              <p className="mt-3 text-xs font-mono text-red-400">{error}</p>
+            )}
         </div>
 
       </div>

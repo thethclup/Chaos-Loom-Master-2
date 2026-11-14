@@ -16,7 +16,8 @@ export default function App() {
   const [gameState, setGameState] = useState<GameState>('TITLE');
   const [score, setScore] = useState(0);
   const { isConnected } = useAccount();
-  const { sayGM, isPending } = useSayGM();
+  const { sayGM, isPending, isConfirming, isConfirmed } = useSayGM();
+  const isBusy = isPending || isConfirming;
 
   return (
     <div className="w-full h-screen bg-black overflow-hidden font-sans text-white select-none relative">
@@ -24,15 +25,23 @@ export default function App() {
         <div className="absolute top-4 right-4 z-50">
           <button
             onClick={sayGM}
-            disabled={isPending}
+            disabled={isBusy}
             className={`px-3 py-2 rounded-lg border transition-colors flex items-center gap-2 font-['Cinzel'] text-xs font-bold ${
-              isPending 
+              isBusy 
                 ? 'bg-gray-800 text-gray-500 border-gray-700 cursor-not-allowed' 
-                : 'bg-[#E8A020]/20 hover:bg-[#E8A020]/30 border-[#E8A020]/40 text-[#E8A020]'
+                : isConfirmed
+                  ? 'bg-emerald-500/20 hover:bg-emerald-500/30 border-emerald-400/50 text-emerald-300'
+                  : 'bg-[#E8A020]/20 hover:bg-[#E8A020]/30 border-[#E8A020]/40 text-[#E8A020]'
             }`}
           >
             <Sun size={16} />
-            {isPending ? 'Sending...' : 'Say GM'}
+            {isPending
+              ? 'Sending...'
+              : isConfirming
+                ? 'Confirming...'
+                : isConfirmed
+                  ? 'GM Confirmed'
+                  : 'Say GM'}
           </button>
         </div>
       )}

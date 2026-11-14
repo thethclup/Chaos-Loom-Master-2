@@ -1,16 +1,19 @@
 import { motion } from 'motion/react';
 import { GameState } from '../App';
-import { useAccount, useConnect, useDisconnect } from 'wagmi';
+import { useAccount, useConnect, useDisconnect, useSwitchChain } from 'wagmi';
 import { injected } from 'wagmi/connectors';
+import { baseDenimMainnet } from '../lib/wagmi';
 
 interface Props {
   setGameState: (state: GameState) => void;
 }
 
 export default function TitleScreen({ setGameState }: Props) {
-  const { address, isConnected } = useAccount();
+  const { address, isConnected, chainId } = useAccount();
   const { connect } = useConnect();
   const { disconnect } = useDisconnect();
+  const { switchChain, isPending: isSwitching } = useSwitchChain();
+  const isWrongNetwork = isConnected && chainId !== baseDenimMainnet.id;
 
   return (
     <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black bg-opacity-80 backdrop-blur-md">
@@ -51,10 +54,19 @@ export default function TitleScreen({ setGameState }: Props) {
            </button>
          </div>
 
-         <div className="mt-16 border-t border-purple-900/50 pt-8 w-full max-w-xs flex flex-col items-center">
+         <div className="mt-16 border-t border-purple-900/50 pt-8 w-full max-w-xs flex flex-col items-center gap-3">
             {isConnected ? (
-              <div className="text-center">
+              <div className="text-center w-full">
                 <p className="text-xs font-mono text-green-400 mb-2">Connected: {address?.substring(0,6)}...{address?.substring(address.length - 4)}</p>
+                {isWrongNetwork && (
+                  <button
+                    onClick={() => switchChain({ chainId: baseDenimMainnet.id })}
+                    disabled={isSwitching}
+                    className="mb-2 w-full bg-[#0052FF] text-white py-2 px-4 text-xs uppercase tracking-widest font-bold hover:bg-blue-600 transition-colors"
+                  >
+                    {isSwitching ? 'Switching...' : 'Switch to Base Mainnet'}
+                  </button>
+                )}
                 <button onClick={() => disconnect()} className="text-[10px] text-gray-500 hover:text-gray-300 uppercase tracking-widest">Disconnect</button>
               </div>
             ) : (

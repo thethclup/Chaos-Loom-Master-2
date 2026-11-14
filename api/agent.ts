@@ -19,6 +19,9 @@ export default async function handler(req: Request) {
     status: "active",
     wallet: "0xe157F1F5e12adB38Ba013683E9Ce24efe21e5bA6",
     platform: "Chaos2",
+    network: "Base Mainnet",
+    chainId: 8453,
+    blockTimeMs: 200,
     version: "1.0.0",
     type: "ERC-8004 Agent",
     lastUpdated: new Date().toISOString()

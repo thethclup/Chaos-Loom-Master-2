@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { GameState } from '../App';
 import { deployAgent } from '../lib/erc8004/agents';
 
@@ -6,14 +7,15 @@ interface Props {
 }
 
 export default function LoomSanctum({ setGameState }: Props) {
+  const [deployedAgentId, setDeployedAgentId] = useState<string | null>(null);
   
   const handleDeployAgent = () => {
-    deployAgent({
+    const res = deployAgent({
       id: "tsk_" + Date.now(),
       name: "Auto-Weave Protocol",
       targetAddress: "0x123..."
     });
-    alert("Trustless Agent deployed! It will now weave chaos in the background automatically on-chain.");
+    setDeployedAgentId(res.agentId);
   };
 
   return (
@@ -67,6 +69,11 @@ export default function LoomSanctum({ setGameState }: Props) {
            >
              Deploy Auto-Weaver Agent
            </button>
+           {deployedAgentId && (
+             <p className="relative z-10 mt-4 text-xs font-mono text-emerald-400">
+               Trustless Agent deployed ({deployedAgentId}) on Base Mainnet.
+             </p>
+           )}
         </div>
 
       </div>
